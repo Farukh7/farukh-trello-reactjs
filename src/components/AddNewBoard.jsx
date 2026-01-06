@@ -8,15 +8,16 @@ import {
   Button,
   Card,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 
-export default function AddNewBoard({ onCreate }) {
+export default function AddNewBoard({ onCreate, loading }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!name.trim()) return;
-    onCreate(name.trim());
+    await onCreate(name.trim());
     setName("");
     setOpen(false);
   };
@@ -43,7 +44,7 @@ export default function AddNewBoard({ onCreate }) {
 
       <Dialog
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={() => !loading && setOpen(false)}
         maxWidth="xs"
         fullWidth
       >
@@ -53,15 +54,18 @@ export default function AddNewBoard({ onCreate }) {
             autoFocus
             fullWidth
             label="Board name"
+            disabled={loading}
             value={name}
             onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+            onKeyDown={(e) => e.key === "Enter" && !loading && handleCreate()}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleCreate}>
-            Create
+          <Button onClick={() => setOpen(false)} disabled={loading}>
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={handleCreate} disabled={loading} sx={{ minWidth: 80 }}>
+            {loading ? <CircularProgress size={24} color="inherit" /> : "Create"}
           </Button>
         </DialogActions>
       </Dialog>
