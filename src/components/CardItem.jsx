@@ -39,7 +39,7 @@ export default function CardItem({ id, text, onUpdate }) {
       >
         <div className="p-2 flex items-center gap-2">
           
-          {/* ✅ Circular Checkbox */}
+          {/* Circular Checkbox */}
           <span
             onClick={handleMarkComplete}
             className={`
