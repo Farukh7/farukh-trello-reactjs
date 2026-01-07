@@ -15,6 +15,8 @@ const deleteListURL = (listId) => {
   return `${URL}/lists/${listId}/closed?key=${API_KEY}&token=${TOKEN}`
 }
 
+
+
 //List Card API URLs
 const fetchCardsURL = (listId) => {
   return `${URL}/lists/${listId}/cards?key=${API_KEY}&token=${TOKEN}`
@@ -28,6 +30,10 @@ const deleteCardURL = (cardId) => {
   return `${URL}/cards/${cardId}?key=${API_KEY}&token=${TOKEN}`
 }
 
+const markListComplete = (cardId) => {
+  return `${URL}/cards/${cardId}?key=${API_KEY}&token=${TOKEN}`
+}
+
 export {
   fetchListsURL,
   createListURL,
@@ -35,4 +41,5 @@ export {
   fetchCardsURL,
   addCardURL,
   deleteCardURL,
+  markListComplete
 }
