@@ -1,4 +1,3 @@
-import React from "react"
 import {
   Dialog,
   DialogTitle,
@@ -19,8 +18,8 @@ const CardDialog = ({ open, onClose, card }) => {
       maxWidth="md"
       PaperProps={{
         sx: {
-          bgcolor: "#282E33", // Trello dark mode card bg
-          color: "#B6C2CF", // Trello dark mode text
+          bgcolor: "#282E33", 
+          color: "#B6C2CF",
           borderRadius: "12px",
           backgroundImage: "none",
         },

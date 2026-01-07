@@ -11,7 +11,7 @@ export default function CardItem({ id, text, onUpdate }) {
   const [completed, setCompleted] = useState(false);
 
   const handleMarkComplete = async (e) => {
-    e.stopPropagation(); // 🚫 prevent card open
+    e.stopPropagation();
 
     const newStatus = !completed;
     setCompleted(newStatus);

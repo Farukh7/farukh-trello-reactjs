@@ -3,7 +3,7 @@ import ListColumn from "../components/ListColumn";
 import { useParams } from "react-router-dom";
 import { fetchListsURL, createListURL } from "../API/lists";
 import axios from "axios";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Button } from "@mui/material";
 
 export default function BoardPage() {
   const { id } = useParams();
@@ -34,7 +34,7 @@ export default function BoardPage() {
     try {
       const url = createListURL({ boardID: id, listName: title });
       const res = await axios.post(url);
-      setLists([...lists, res.data]);
+      setLists((prev) => [...prev, res.data]);
       setTitle("");
       setAdding(false);
     } catch (error) {
@@ -66,44 +66,63 @@ export default function BoardPage() {
           "url(https://images.unsplash.com/photo-1500530855697-b586d89ba3ee)",
       }}
     >
-      {/* BOARD TITLE */}
-      <div className="px-6 py-4 text-white text-xl font-semibold backdrop-blur-md bg-black/30">
+      {/* BOARD HEADER */}
+      <div className="px-4 py-3 text-white text-lg font-semibold backdrop-blur-md bg-black/30 sticky top-0 z-10">
         My Board
       </div>
 
-      {/* LIST CONTAINER */}
-      <div className="flex gap-4 px-6 py-4 overflow-x-auto items-start h-[calc(100vh-64px)]">
+      {/* LIST CONTAINER (X-scroll enabled) */}
+      <div
+        className="
+          flex gap-4 px-4 py-4
+          overflow-x-auto overflow-y-hidden
+          items-start
+          h-[calc(100dvh-56px)]
+          whitespace-nowrap
+        "
+        style={{ WebkitOverflowScrolling: "touch" }}
+      >
         {lists.map((list) => (
-          <ListColumn key={list.id} id={list.id} title={list.name} />
+          <div key={list.id} className="shrink-0">
+            <ListColumn id={list.id} title={list.name} />
+          </div>
         ))}
 
         {/* ADD LIST */}
         {!adding ? (
-          <button
+          <Button
             onClick={() => setAdding(true)}
-            className="min-w-[272px] h-11
-              bg-white/60 hover:bg-white/80
-              text-black font-medium rounded-xl
-              backdrop-blur-md transition flex items-center justify-center"
+            sx={{
+              width: { xs: 260, sm: 280 },
+              minWidth: { xs: 260, sm: 280 },
+              height: 44,
+              flexShrink: 0,
+              bgcolor: "rgba(255,255,255,0.9)",
+              color: "#1D2125",
+              fontWeight: 600,
+              textTransform: "none",
+              borderRadius: 2,
+              "&:hover": { bgcolor: "#fff" },
+            }}
           >
             + Add another list
-          </button>
+          </Button>
         ) : (
-          <div className="min-w-[272px] bg-white/80 backdrop-blur-md rounded-xl p-3">
+          <div className="w-65 sm:w-70 shrink-0 bg-white/80 backdrop-blur-md rounded-xl p-3">
             <input
               autoFocus
               value={title}
               disabled={creatingList}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter list title"
-              className="w-full p-2 rounded bg-white text-black outline-none border border-transparent focus:border-blue-500 transition-colors"
+              className="w-full p-2 rounded bg-white text-black outline-none border border-transparent focus:border-blue-500"
               onKeyDown={(e) => e.key === "Enter" && addList()}
             />
             <div className="flex gap-2 mt-2 items-center">
               <button
                 onClick={addList}
                 disabled={creatingList}
-                className="bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded text-sm text-white font-medium min-w-[70px] flex justify-center items-center transition-colors disabled:opacity-50"
+                className="bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded text-sm text-white font-medium min-w-17.5 flex justify-center items-center"
               >
                 {creatingList ? (
                   <CircularProgress size={16} color="inherit" />
@@ -111,9 +130,9 @@ export default function BoardPage() {
                   "Add list"
                 )}
               </button>
-              <button 
+              <button
                 onClick={() => !creatingList && setAdding(false)}
-                className={`text-gray-700 hover:text-black transition-colors ${creatingList && 'cursor-not-allowed opacity-50'}`}
+                className="text-gray-700 hover:text-black"
               >
                 ✕
               </button>

@@ -28,7 +28,7 @@ const CheckListItem = ({ checkList }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
 
-  // 🔴 delete popup state
+  //  delete popup state
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
@@ -63,13 +63,13 @@ const CheckListItem = ({ checkList }) => {
     }
   };
 
-  // 🔹 open delete popup
+  //  open delete popup
   const handleOpenDelete = (item) => {
     setItemToDelete(item);
     setConfirmOpen(true);
   };
 
-  // 🔹 confirm delete
+  //  confirm delete
   const handleConfirmDelete = async () => {
     if (!itemToDelete) return;
     setDeletingId(itemToDelete.id);
@@ -113,7 +113,7 @@ const CheckListItem = ({ checkList }) => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      {/* ✅ Progress bar (unchanged) */}
+      {/* Progress bar (unchanged) */}
       <Box display="flex" alignItems="center" mb={1.5}>
         <Typography sx={{ minWidth: 35, color: "#9FADBC" }}>
           {Math.round(progress)}%
@@ -194,7 +194,7 @@ const CheckListItem = ({ checkList }) => {
         <Button onClick={() => setOpen(true)}>Add an item</Button>
       )}
 
-      {/* 🔴 Delete confirmation popup */}
+      {/* Delete confirmation popup */}
       <Dialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}

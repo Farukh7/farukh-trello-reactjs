@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -27,7 +27,7 @@ const CheckList = ({ card }) => {
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
 
-  // 🔴 delete confirmation state
+  // delete confirmation state
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [listToDelete, setListToDelete] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
@@ -214,7 +214,7 @@ const CheckList = ({ card }) => {
         </DialogActions>
       </Dialog>
 
-      {/* 🔴 Delete confirmation dialog (FIXED) */}
+      {/* Delete confirmation dialog (FIXED) */}
       <Dialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}

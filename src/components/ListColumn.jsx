@@ -118,7 +118,7 @@ export default function ListColumn({ id, title }) {
               <button
                 onClick={addCard}
                 disabled={addingCard}
-                className="bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded text-sm text-white font-medium min-w-[80px] flex justify-center items-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded text-sm text-white font-medium min-w-20 flex justify-center items-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {addingCard ? (
                   <CircularProgress size={16} color="inherit" />
