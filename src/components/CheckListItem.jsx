@@ -25,7 +25,6 @@ const CheckListItem = ({ checkList }) => {
   const [newCheckItem, setNewCheckItem] = useState("");
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [isAdding, setIsAdding] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
 
   //  delete popup state
@@ -45,7 +44,6 @@ const CheckListItem = ({ checkList }) => {
 
   const handleAddCheckItem = async () => {
     if (!newCheckItem) return;
-    setIsAdding(true);
     try {
       const res = await axios.post(
         addCheckItemURL({
@@ -58,8 +56,6 @@ const CheckListItem = ({ checkList }) => {
       setOpen(false);
     } catch (err) {
       console.error(err);
-    } finally {
-      setIsAdding(false);
     }
   };
 

@@ -5,9 +5,8 @@ import CardDialog from "./CardDialog";
 import { markListComplete } from "../API/lists";
 import axios from "axios";
 
-export default function CardItem({ id, text, onUpdate }) {
+export default function CardItem({ id, title }) {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState(text);
   const [completed, setCompleted] = useState(false);
 
   const handleMarkComplete = async (e) => {

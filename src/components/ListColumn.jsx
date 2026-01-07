@@ -42,12 +42,6 @@ export default function ListColumn({ id, title }) {
     }
   };
 
-  const updateCard = (index, newText) => {
-    const updated = [...cards];
-    updated[index].name = newText; // Assuming updated[index] is an object
-    setCards(updated);
-  };
-
   return (
     <Card
       sx={{
@@ -81,8 +75,7 @@ export default function ListColumn({ id, title }) {
             <CardItem
               key={card.id || index}
               id={card.id}
-              text={card.name}
-              onUpdate={(val) => updateCard(index, val)}
+              title={card.name}
             />
           ))
         )}

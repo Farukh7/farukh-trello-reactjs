@@ -7,7 +7,7 @@ const fetchBoardsURL = () => {
 }
 
 const createBoardURL = (boardName) => {
-  return `${URL}/boards/?name=${boardName.name}&key=${API_KEY}&token=${TOKEN}`
+  return `${URL}/boards/?name=${boardName}&key=${API_KEY}&token=${TOKEN}`
 }
 
 export { fetchBoardsURL , createBoardURL}
