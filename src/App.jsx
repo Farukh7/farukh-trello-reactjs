@@ -12,7 +12,7 @@ export default function App() {
       children: [{ index: true, element: <HomePage /> }],
     },
     {
-      path: "/board/:id",
+      path: "/boards/:id",
       element: <BoardLayout />,
       children: [{ index: true, element: <BoardPage /> }],
     },

@@ -6,7 +6,7 @@ export default function BoardCard({ board }) {
 
   return (
     <Card
-      onClick={() => navigate(`/board/${board.id}`)}
+      onClick={() => navigate(`/boards/${board.id}`)}
       sx={{
         width: 240,
         height: 140,

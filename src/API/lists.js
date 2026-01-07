@@ -8,7 +8,7 @@ const fetchListsURL = (boardID) => {
 };
 
 const createListURL = ({ boardID, listName }) => {
-  return `https://api.trello.com/1/lists?name=${listName}&idBoard=${boardID}&key=${API_KEY}&token=${TOKEN}`;
+  return `${URL}/lists?name=${listName}&idBoard=${boardID}&key=${API_KEY}&token=${TOKEN}`;
 };
 
 const deleteListURL = (listId) => {
