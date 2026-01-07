@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Box, Typography, CircularProgress } from "@mui/material";
 import BoardCard from "./BoardCard";
 import AddNewBoard from "./AddNewBoard";
-import { getBoards, createBoard } from "../api/APICall";
+import { getBoards, createBoard } from "../API/APICall";
 
 export default function Boards() {
   const [boards, setBoards] = useState([]);
