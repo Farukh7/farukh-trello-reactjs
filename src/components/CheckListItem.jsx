@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Checkbox,
@@ -11,237 +11,219 @@ import {
   LinearProgress,
   Typography,
   CircularProgress,
-} from "@mui/material"
-import DeleteIcon from "@mui/icons-material/Delete"
-import axios from "axios"
-import { deleteCheckItemURL, addCheckItemURL, updateCheckItemStateURL } from "../API/checkLists"
-
-
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import axios from "axios";
+import {
+  deleteCheckItemURL,
+  addCheckItemURL,
+  updateCheckItemStateURL,
+} from "../API/checkLists";
 
 const CheckListItem = ({ checkList }) => {
-  const [items, setItems] = useState([])
-  const [newCheckItem, setNewCheckItem] = useState("")
-  const [open, setOpen] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [isAdding, setIsAdding] = useState(false)
-  const [deletingId, setDeletingId] = useState(null)
+  const [items, setItems] = useState([]);
+  const [newCheckItem, setNewCheckItem] = useState("");
+  const [open, setOpen] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isAdding, setIsAdding] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+
+  // 🔴 delete popup state
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
-    if (checkList && checkList.checkItems) {
-      setItems(checkList.checkItems)
+    if (checkList?.checkItems) {
+      setItems(checkList.checkItems);
     }
-  }, [checkList])
+  }, [checkList]);
 
   useEffect(() => {
-    updateProgress(items)
-  }, [items])
-
-  const updateProgress = (currentItems) => {
-    const completedItems = currentItems.filter(
-      (item) => item.state === "complete"
-    ).length
-    const totalItems = currentItems.length
-    const newProgress = totalItems ? (completedItems / totalItems) * 100 : 0
-    setProgress(newProgress)
-  }
+    const completed = items.filter((i) => i.state === "complete").length;
+    setProgress(items.length ? (completed / items.length) * 100 : 0);
+  }, [items]);
 
   const handleAddCheckItem = async () => {
-    if (!newCheckItem) return
-    setIsAdding(true)
+    if (!newCheckItem) return;
+    setIsAdding(true);
     try {
-      const url = addCheckItemURL({
-        checkListId: checkList.id,
-        itemName: newCheckItem,
-      })
-      const res = await axios.post(url)
-      setItems((prev) => [...prev, res.data])
-      setNewCheckItem("")
-      setOpen(false)
-    } catch (error) {
-      console.error("Error adding check item:", error)
+      const res = await axios.post(
+        addCheckItemURL({
+          checkListId: checkList.id,
+          itemName: newCheckItem,
+        })
+      );
+      setItems((prev) => [...prev, res.data]);
+      setNewCheckItem("");
+      setOpen(false);
+    } catch (err) {
+      console.error(err);
     } finally {
-      setIsAdding(false)
+      setIsAdding(false);
     }
-  }
+  };
 
-  const handleDeleteCheckItem = async (itemId) => {
-    setDeletingId(itemId)
+  // 🔹 open delete popup
+  const handleOpenDelete = (item) => {
+    setItemToDelete(item);
+    setConfirmOpen(true);
+  };
+
+  // 🔹 confirm delete
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+    setDeletingId(itemToDelete.id);
     try {
-      const url = deleteCheckItemURL({ checkListId: checkList.id, itemId })
-      await axios.delete(url)
-      setItems((prev) => prev.filter((item) => item.id !== itemId))
-    } catch (error) {
-      console.error("Error deleting check item:", error)
+      await axios.delete(
+        deleteCheckItemURL({
+          checkListId: checkList.id,
+          itemId: itemToDelete.id,
+        })
+      );
+      setItems((prev) => prev.filter((item) => item.id !== itemToDelete.id));
+    } catch (err) {
+      console.error(err);
     } finally {
-      setDeletingId(null)
+      setDeletingId(null);
+      setConfirmOpen(false);
+      setItemToDelete(null);
     }
-  }
+  };
 
   const handleCheckItemStateChange = async (itemId, currentState) => {
-    const newState = currentState === "complete" ? "incomplete" : "complete"
-    try {
-      // Optimistic update
-      setItems((prev) =>
-        prev.map((item) =>
-          item.id === itemId ? { ...item, state: newState } : item
-        )
+    const newState = currentState === "complete" ? "incomplete" : "complete";
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId ? { ...item, state: newState } : item
       )
+    );
 
-      const url = updateCheckItemStateURL({
-        cardId: checkList.idCard,
-        itemId,
-        state: newState,
-      })
-      await axios.put(url)
-    } catch (error) {
-      console.error("Error updating check item state:", error)
-      // Revert if failed
-      setItems((prev) =>
-        prev.map((item) =>
-          item.id === itemId ? { ...item, state: currentState } : item
-        )
-      )
+    try {
+      await axios.put(
+        updateCheckItemStateURL({
+          cardId: checkList.idCard,
+          itemId,
+          state: newState,
+        })
+      );
+    } catch (err) {
+      console.error(err);
     }
-  }
+  };
 
   return (
     <Box sx={{ width: "100%" }}>
+      {/* ✅ Progress bar (unchanged) */}
       <Box display="flex" alignItems="center" mb={1.5}>
-          <Typography variant="body2" sx={{ minWidth: "35px", color: "#9FADBC" }}>
-            {Math.round(progress)}%
-          </Typography>
-          <LinearProgress
-            variant="determinate"
-            value={progress}
-            sx={{
-              width: "100%",
-              height: 6,
-              borderRadius: 4,
-              ml: 1,
-              bgcolor: "#3F464E", // Darker track
-              "& .MuiLinearProgress-bar": {
-                backgroundColor: "#579DFF", // Brand blue
-              },
-            }}
-          />
+        <Typography sx={{ minWidth: 35, color: "#9FADBC" }}>
+          {Math.round(progress)}%
+        </Typography>
+        <LinearProgress
+          variant="determinate"
+          value={progress}
+          sx={{
+            width: "100%",
+            height: 6,
+            borderRadius: 4,
+            ml: 1,
+            bgcolor: "#3F464E",
+            "& .MuiLinearProgress-bar": {
+              backgroundColor: "#579DFF",
+            },
+          }}
+        />
       </Box>
 
+      {/* Checklist items */}
       {items.map((item) => (
-        <Box 
-            key={item.id} 
-            display="flex" 
-            alignItems="center" 
-            mb={0.5}
-            sx={{
-                '&:hover .delete-btn': { opacity: 1 }
-            }}
+        <Box
+          key={item.id}
+          display="flex"
+          alignItems="center"
+          mb={0.5}
+          sx={{ "&:hover .delete-btn": { opacity: 1 } }}
         >
           <Checkbox
             checked={item.state === "complete"}
             onChange={() => handleCheckItemStateChange(item.id, item.state)}
-            sx={{
-                color: "#9FADBC",
-                '&.Mui-checked': {
-                    color: "#579DFF",
-                },
-                padding: "4px 8px 4px 0"
-            }}
           />
           <Typography
             sx={{
-              textDecoration: item.state === "complete" ? "line-through" : "none",
-              color: item.state === "complete" ? "#596773" : "#B6C2CF",
               flexGrow: 1,
-              fontSize: "0.95rem"
+              color: item.state === "complete" ? "#596773" : "#B6C2CF",
+              textDecoration:
+                item.state === "complete" ? "line-through" : "none",
             }}
           >
             {item.name}
           </Typography>
+
+          {/* 🗑️ Delete icon */}
           <Button
             className="delete-btn"
-            disabled={deletingId === item.id}
-            sx={{ 
-                minWidth: "auto", 
-                padding: "4px", 
-                color: "#9FADBC", 
-                opacity: 0, 
-                transition: "opacity 0.2s",
-                "&:hover": { color: "#e6e6e6", bgcolor: "rgba(255,255,255,0.08)" }
-            }}
-            onClick={() => handleDeleteCheckItem(item.id)}
+            sx={{ opacity: 0 }}
+            onClick={() => handleOpenDelete(item)}
           >
-             {deletingId === item.id ? (
-                 <CircularProgress size={16} sx={{ color: '#9FADBC' }} />
-             ) : (
-                <DeleteIcon fontSize="small" />
-             )}
+            {deletingId === item.id ? (
+              <CircularProgress size={16} />
+            ) : (
+              <DeleteIcon fontSize="small" />
+            )}
           </Button>
         </Box>
       ))}
 
+      {/* Add item UI */}
       {open ? (
-         <Box sx={{ mt: 1 }}>
-             <TextField
-                autoFocus
-                fullWidth
-                placeholder="Add an item"
-                value={newCheckItem}
-                onChange={(e) => setNewCheckItem(e.target.value)}
-                disabled={isAdding}
-                sx={{
-                    mb: 1,
-                    '& .MuiOutlinedInput-root': {
-                        color: '#B6C2CF',
-                        bgcolor: "#22272B",
-                        '& fieldset': { borderColor: '#579DFF', borderWidth: 2 },
-                        '&:hover fieldset': { borderColor: '#579DFF' },
-                        '&.Mui-focused fieldset': { borderColor: '#579DFF' },
-                        '&.Mui-disabled': { color: '#738496' } 
-                    }
-                }}
-             />
-             <Box sx={{ display: 'flex', gap: 1 }}>
-                 <Button 
-                    variant="contained" 
-                    onClick={handleAddCheckItem}
-                    disabled={isAdding}
-                    sx={{ bgcolor: "#579DFF", color: "#1D2125", textTransform: "none", fontWeight: 600, "&:hover": { bgcolor: "#85B8FF" }, minWidth: 60 }}
-                 >
-                    {isAdding ? <CircularProgress size={20} sx={{color: '#1D2125'}} /> : "Add"}
-                 </Button>
-                 <Button 
-                    onClick={() => setOpen(false)}
-                    disabled={isAdding}
-                    sx={{ color: "#9FADBC", textTransform: "none", "&:hover": { color: "#B6C2CF" } }}
-                 >
-                    Cancel
-                 </Button>
-             </Box>
-         </Box>
+        <Box sx={{ mt: 1 }}>
+          <TextField
+            autoFocus
+            fullWidth
+            placeholder="Add an item"
+            value={newCheckItem}
+            onChange={(e) => setNewCheckItem(e.target.value)}
+          />
+          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+            <Button variant="contained" onClick={handleAddCheckItem}>
+              Add
+            </Button>
+            <Button onClick={() => setOpen(false)}>Cancel</Button>
+          </Box>
+        </Box>
       ) : (
-          <Button 
-            onClick={() => setOpen(true)} 
-            sx={{
-                mt: 1,
-                bgcolor: "#2F353C",
-                color: "#B6C2CF",
-                textTransform: "none",
-                justifyContent: "flex-start",
-                px: 2,
-                py: 0.75,
-                "&:hover": {
-                    bgcolor: "#3F464E",
-                    color: "#e6e6e6"
-                }
-            }}
-          >
-            Add an item
-          </Button>
+        <Button onClick={() => setOpen(true)}>Add an item</Button>
       )}
 
+      {/* 🔴 Delete confirmation popup */}
+      <Dialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        disableEnforceFocus
+        disableRestoreFocus
+        PaperProps={{
+          sx: { bgcolor: "#282E33", color: "#B6C2CF" },
+        }}
+      >
+        <DialogTitle>Delete item?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete{" "}
+            <strong>{itemToDelete?.name}</strong>?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
-  )
-}
+  );
+};
 
-export default CheckListItem
-
+export default CheckListItem;

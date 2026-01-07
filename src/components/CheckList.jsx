@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -7,101 +7,104 @@ import {
   DialogTitle,
   TextField,
   Box,
-  Paper,
   Typography,
   CircularProgress,
-} from "@mui/material"
-import ChecklistIcon from '@mui/icons-material/Checklist';
-import DeleteIcon from "@mui/icons-material/Delete"
-import axios from "axios"
-import CheckListItem from "./CheckListItem"
+} from "@mui/material";
+import ChecklistIcon from "@mui/icons-material/Checklist";
+import DeleteIcon from "@mui/icons-material/Delete";
+import axios from "axios";
+import CheckListItem from "./CheckListItem";
 import {
   fetchCheckListURL,
   addCheckListURL,
   deleteCheckListURL,
-} from "../API/checkLists"
+} from "../API/checkLists";
 
 const CheckList = ({ card }) => {
-  const [checklist, setChecklist] = useState([])
-  const [checkListName, setCheckListName] = useState("")
-  const [open, setOpen] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [isAdding, setIsAdding] = useState(false)
-  const [deletingId, setDeletingId] = useState(null)
+  const [checklist, setChecklist] = useState([]);
+  const [checkListName, setCheckListName] = useState("");
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isAdding, setIsAdding] = useState(false);
+
+  // 🔴 delete confirmation state
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [listToDelete, setListToDelete] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     const fetchCheckList = async () => {
-      if (!card?.id) return
+      if (!card?.id) return;
       try {
-        const endPoint = fetchCheckListURL(card.id)
-        const res = await axios.get(endPoint)
-        setChecklist(res.data)
+        const res = await axios.get(fetchCheckListURL(card.id));
+        setChecklist(res.data);
       } catch (error) {
-        console.error("Error fetching checklists:", error)
+        console.error("Error fetching checklists:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    fetchCheckList()
-  }, [card.id])
+    };
+    fetchCheckList();
+  }, [card?.id]);
 
   const handleCloseAddList = () => {
-    setOpen(false)
-    setCheckListName("")
-  }
+    setOpen(false);
+    setCheckListName("");
+  };
 
   const handleAddList = async () => {
-    if (!checkListName) return
-    setIsAdding(true)
+    if (!checkListName.trim()) return;
+    setIsAdding(true);
     try {
-      const url = addCheckListURL({
-        cardId: card.id,
-        checkListName,
-      })
-      const res = await axios.post(url)
-      // The API returns the new checklist object. 
-      // Ensure it has checkItems array initialized if not present (though usually it's empty)
-      const newList = { ...res.data, checkItems: [] }
-      setChecklist([...checklist, newList])
-      handleCloseAddList()
-    } catch (error) {
-      console.error("Error adding checklist:", error)
-    } finally {
-      setIsAdding(false)
-    }
-  }
+      const res = await axios.post(
+        addCheckListURL({
+          cardId: card.id,
+          checkListName,
+        })
+      );
 
-  const handleDeleteCheckList = async (list) => {
-    setDeletingId(list.id)
-    try {
-      const url = deleteCheckListURL({ cardId: card.id, listId: list.id })
-      await axios.delete(url)
-      setChecklist(checklist.filter((l) => l.id !== list.id))
+      setChecklist((prev) => [...prev, { ...res.data, checkItems: [] }]);
+
+      handleCloseAddList();
     } catch (error) {
-      console.error("Error deleting checklist:", error)
+      console.error("Error adding checklist:", error);
     } finally {
-      setDeletingId(null)
+      setIsAdding(false);
     }
-  }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!listToDelete) return;
+    setDeletingId(listToDelete.id);
+    try {
+      await axios.delete(
+        deleteCheckListURL({
+          cardId: card.id,
+          listId: listToDelete.id,
+        })
+      );
+      setChecklist((prev) => prev.filter((l) => l.id !== listToDelete.id));
+      setConfirmOpen(false);
+      setListToDelete(null);
+    } catch (error) {
+      console.error("Error deleting checklist:", error);
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-        <CircularProgress size={30} sx={{ color: '#9FADBC' }} />
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+        <CircularProgress size={30} sx={{ color: "#9FADBC" }} />
       </Box>
-    )
+    );
   }
 
   return (
     <Box sx={{ width: "100%", mt: 1 }}>
       {checklist.map((list) => (
-        <Box
-          key={list.id}
-          sx={{
-            mb: 3,
-            color: "#B6C2CF",
-          }}
-        >
+        <Box key={list.id} sx={{ mb: 3, color: "#B6C2CF" }}>
           <Box
             sx={{
               display: "flex",
@@ -110,15 +113,24 @@ const CheckList = ({ card }) => {
               mb: 1.5,
             }}
           >
-            <Typography variant="h6" sx={{ fontWeight: 600, color: "#9FADBC", display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
+                color: "#9FADBC",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
               <ChecklistIcon />
               {list.name}
             </Typography>
+
             <Button
-              disabled={deletingId === list.id}
-              onClick={(e) => {
-                e.stopPropagation()
-                handleDeleteCheckList(list)
+              onClick={() => {
+                setListToDelete(list);
+                setConfirmOpen(true);
               }}
               sx={{
                 minWidth: "auto",
@@ -131,29 +143,25 @@ const CheckList = ({ card }) => {
                   bgcolor: "#3F464E",
                   color: "#e6e6e6",
                 },
-                "&.Mui-disabled": {
-                    color: "#596773"
-                }
               }}
             >
-              {deletingId === list.id ? <CircularProgress size={20} sx={{ color: '#B6C2CF' }} /> : "Delete"}
+              Delete
             </Button>
           </Box>
-          
-          <Box sx={{ pl: 0 }}>
-             <CheckListItem checkList={list} />
-          </Box>
 
+          <CheckListItem checkList={list} />
         </Box>
       ))}
+
+      {/* ➕ Add list button */}
       <Button
         variant="contained"
         onClick={() => setOpen(true)}
         sx={{
           mt: 2,
-          bgcolor: "#579DFF", // Trello blue
+          bgcolor: "#579DFF",
           color: "#1D2125",
-          fontWeight: "600",
+          fontWeight: 600,
           textTransform: "none",
           "&:hover": {
             bgcolor: "#85B8FF",
@@ -163,12 +171,17 @@ const CheckList = ({ card }) => {
         Add a list
       </Button>
 
-      <Dialog open={open} onClose={handleCloseAddList}
+      {/* ➕ Add list dialog (FIXED) */}
+      <Dialog
+        open={open}
+        onClose={handleCloseAddList}
+        disableEnforceFocus
+        disableRestoreFocus
         PaperProps={{
-            sx: {
-                bgcolor: "#282E33",
-                color: "#B6C2CF"
-            }
+          sx: {
+            bgcolor: "#282E33",
+            color: "#B6C2CF",
+          },
         }}
       >
         <DialogTitle>Add a list</DialogTitle>
@@ -176,38 +189,78 @@ const CheckList = ({ card }) => {
           <TextField
             autoFocus
             margin="dense"
-            id="name"
             label="List Name"
             fullWidth
-            variant="outlined"
             value={checkListName}
             onChange={(e) => setCheckListName(e.target.value)}
             disabled={isAdding}
-            sx={{
-                '& .MuiOutlinedInput-root': {
-                    color: '#B6C2CF',
-                    '& fieldset': {
-                        borderColor: '#738496',
-                    },
-                    '&:hover fieldset': {
-                        borderColor: '#8590A2',
-                    },
-                },
-                '& .MuiInputLabel-root': {
-                    color: '#9FADBC',
-                },
-            }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseAddList} sx={{color: "#9FADBC"}} disabled={isAdding}>Cancel</Button>
-          <Button onClick={handleAddList} type="submit" variant="contained" disabled={isAdding} sx={{ minWidth: 64 }}>
+          <Button
+            onClick={handleCloseAddList}
+            sx={{ color: "#9FADBC" }}
+            disabled={isAdding}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleAddList}
+            variant="contained"
+            disabled={isAdding}
+          >
             {isAdding ? <CircularProgress size={24} color="inherit" /> : "Add"}
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
-  )
-}
 
-export default CheckList
+      {/* 🔴 Delete confirmation dialog (FIXED) */}
+      <Dialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        disableEnforceFocus
+        disableRestoreFocus
+        PaperProps={{
+          sx: {
+            bgcolor: "#282E33",
+            color: "#B6C2CF",
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 600 }}>Delete checklist?</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ color: "#9FADBC" }}>
+            Are you sure you want to delete{" "}
+            <strong>{listToDelete?.name}</strong>? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setConfirmOpen(false)}
+            sx={{ color: "#9FADBC" }}
+            disabled={deletingId}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            variant="contained"
+            color="error"
+            disabled={deletingId}
+            startIcon={
+              deletingId ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : (
+                <DeleteIcon />
+              )
+            }
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+};
+
+export default CheckList;
