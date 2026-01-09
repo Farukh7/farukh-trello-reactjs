@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Box, Typography, CircularProgress } from "@mui/material";
 import BoardCard from "./BoardCard";
 import AddNewBoard from "./AddNewBoard";
-import { createBoardURL, fetchBoardsURL } from "../API/board";
+import { createBoardURL, fetchBoardsURL } from "../../API/board";
 import axios from "axios";
 
 export default function Boards() {

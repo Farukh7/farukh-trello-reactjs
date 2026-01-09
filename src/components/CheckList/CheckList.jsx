@@ -18,7 +18,7 @@ import {
   fetchCheckListURL,
   addCheckListURL,
   deleteCheckListURL,
-} from "../API/checkLists";
+} from "../../API/checkLists";
 
 const CheckList = ({ card }) => {
   const [checklist, setChecklist] = useState([]);

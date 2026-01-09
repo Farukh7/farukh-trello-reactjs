@@ -2,7 +2,7 @@ import { Card } from "@mui/material";
 import { useState } from "react";
 import { FiCheck } from "react-icons/fi";
 import CardDialog from "./CardDialog";
-import { markListComplete } from "../API/lists";
+import { markListComplete } from "../../API/lists";
 import axios from "axios";
 
 export default function CardItem({ id, title }) {
@@ -37,7 +37,6 @@ export default function CardItem({ id, title }) {
         onClick={() => setOpen(true)}
       >
         <div className="p-2 flex items-center gap-2">
-          
           {/* Circular Checkbox */}
           <span
             onClick={handleMarkComplete}
@@ -57,9 +56,7 @@ export default function CardItem({ id, title }) {
 
           {/* Card title */}
           <span
-            className={`text-sm ${
-              completed ? "line-through opacity-60" : ""
-            }`}
+            className={`text-sm ${completed ? "line-through opacity-60" : ""}`}
           >
             {title}
           </span>

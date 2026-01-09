@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card, Typography, CircularProgress } from "@mui/material";
-import CardItem from "./CardItem";
-import { fetchCardsURL, addCardURL } from "../API/lists";
+import CardItem from "../Cards/CardItem";
+import { fetchCardsURL, addCardURL } from "../../API/lists";
 import axios from "axios";
 
 export default function ListColumn({ id, title }) {
@@ -72,11 +72,7 @@ export default function ListColumn({ id, title }) {
           </div>
         ) : (
           cards.map((card, index) => (
-            <CardItem
-              key={card.id || index}
-              id={card.id}
-              title={card.name}
-            />
+            <CardItem key={card.id || index} id={card.id} title={card.name} />
           ))
         )}
       </div>

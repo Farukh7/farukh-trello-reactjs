@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import ListColumn from "../components/ListColumn";
+import ListColumn from "../components/List/ListColumn";
 import { useParams } from "react-router-dom";
 import { fetchListsURL, createListURL } from "../API/lists";
 import axios from "axios";

@@ -18,7 +18,7 @@ import {
   deleteCheckItemURL,
   addCheckItemURL,
   updateCheckItemStateURL,
-} from "../API/checkLists";
+} from "../../API/checkLists";
 
 const CheckListItem = ({ checkList }) => {
   const [items, setItems] = useState([]);
